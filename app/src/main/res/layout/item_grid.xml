@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@drawable/grid_selector_background"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:layout_marginTop="30dp"
+        android:id="@+id/item_grid_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="centerCrop"
+
+        android:src="@drawable/dish" >
+    </ImageView>
+    <TextView
+        android:layout_marginTop="5dp"
+        android:id="@+id/tv_explain"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+   		android:gravity="center_horizontal"
+        android:text="证件照"
+        android:textSize="15sp"
+        android:textColor="@color/dark_grey"
+        android:singleLine="true"
+        />
+    <View
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

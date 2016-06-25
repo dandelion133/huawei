@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".activity.HomeActivity">
+
+
+      <item android:id="@+id/search"
+            android:title="搜索"
+            android:orderInCategory="80"
+            android:icon="@drawable/bg_search"
+            app:showAsAction="ifRoom" />
+
+      <item android:id="@+id/exit"
+            android:title="退出"
+            android:orderInCategory="90"
+            android:icon="@drawable/exit"
+            app:showAsAction="never" />
+
+</menu>
