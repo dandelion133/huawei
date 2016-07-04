@@ -8,6 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qian.R;
+import com.qian.entity.Dish;
+
+import java.util.ArrayList;
 
 /**
  * Created by QHF on 2016/6/23.
@@ -18,15 +21,19 @@ public class DishAdapter extends BaseAdapter {
 
     private Context mContext;
     private int i = 0;
+    private ArrayList<Dish> mDishs = new ArrayList<>();
     public DishAdapter(Context context) {
-        mContext = context;
+        this.mContext = context;
 
     }
-
+    public DishAdapter(Context context,ArrayList<Dish> dishs) {
+        this.mContext = context;
+        this.mDishs = dishs;
+    }
 
     @Override
     public int getCount() {
-        return 20;
+        return mDishs.size();
     }
 
     @Override
@@ -56,7 +63,8 @@ public class DishAdapter extends BaseAdapter {
             view = convertView;
             holder = (RecommendViewHolder) view.getTag();
         }
-
+        holder.dishName.setText(mDishs.get(position).getName());
+        holder.dishImage.setImageResource(mDishs.get(position).getImage());
         return view;
     }
 

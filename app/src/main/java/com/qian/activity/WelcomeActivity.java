@@ -8,17 +8,15 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.qian.R;
 import com.qian.entity.Msg;
-import com.qian.service.SocketService;
 import com.qian.service.SocketService.MyBinder;
 import com.qian.utils.SocketManager;
 
 ;
 
-public class MainActivity extends Activity {
+public class WelcomeActivity extends Activity {
 
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -45,14 +43,14 @@ public class MainActivity extends Activity {
         mManager.receiveMsg();
 
 
-        Intent intent = new Intent(this, SocketService.class);
+       /* Intent intent = new Intent(this, SocketService.class);
         startService(intent);
         boolean isSuccess = bindService(intent, mConnection, BIND_AUTO_CREATE);
         if(isSuccess) {
             Toast.makeText(getApplicationContext(), "服务被成功绑定了", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getApplicationContext(), "服务没有成功绑定", Toast.LENGTH_SHORT).show();
-        }
+        }*/
 
 
 
@@ -60,6 +58,20 @@ public class MainActivity extends Activity {
 
 
     }
+
+    public void select(View view) {
+        switch (view.getId()) {
+            case R.id.customer:
+                startActivity(new Intent(this,HomeActivity.class));
+                finish();
+                break;
+            case R.id.boss:
+
+                break;
+
+        }
+    }
+
     public void send(View view) {
         Msg msg = new Msg("qianhaifeng",
                 mManager.getLocalHostIp(),
@@ -67,7 +79,7 @@ public class MainActivity extends Activity {
                 SocketManager.CMD_SENDMSG,
                 "hahahahaha");
 
-        //Toast.makeText(MainActivity.this, msg+"2222", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(WelcomeActivity.this, msg+"2222", Toast.LENGTH_SHORT).show();
         mManager.sendMsg(msg);
     }
 
