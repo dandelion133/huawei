@@ -77,17 +77,19 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // 為了讓 Toolbar 的 Menu 有作用，這邊的程式不可以拿掉
         getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
     }
 
 
+
+
+
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean dispatchTouchEvent(MotionEvent ev) {
 
         isFirstPress = false;
-        return  super.onTouchEvent(event);
+        return super.dispatchTouchEvent(ev);
     }
 
     /**
