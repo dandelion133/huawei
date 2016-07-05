@@ -6,6 +6,7 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.qian.entity.Dish;
 import com.qian.entity.Msg;
 
 import org.apache.http.conn.util.InetAddressUtils;
@@ -21,6 +22,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.List;
 
 public class SocketManager {
 	// 协议命令
@@ -44,9 +46,17 @@ public class SocketManager {
 			}
 		};
 	
-	public SocketManager(Context context) {
+	private SocketManager(Context context) {
 		mContext = context;
 
+	}
+	private static SocketManager instance = null;
+	public static SocketManager getInstance(Context context) {
+		if(instance == null) {
+			return new SocketManager(context);
+		} else {
+			return instance;
+		}
 	}
 
 	// 发送消息
@@ -107,8 +117,17 @@ public class SocketManager {
 					ds.close();
 					
 					//Log.e
-					Tips(SocketManager.SHOW, msg.getSendUser()+""+msg.getSendUserIp() + " 发来消息！" + msg.getBody());
-					
+					Tips(SocketManager.SHOW, msg.getSendUser()+""+msg.getSendUserIp() + " 发来消息！" + msg.getBody().toString());
+					if(msg.getMsgType() == Msg.MENU_DATA) {
+						List<Dish> list =  XmlUtil.parserXmlFromString(msg.getBody().toString());
+						Log.e("1111",list.size()+"\n");
+						for(Dish dish : list) {
+							Log.e("1111",dish.toString()+"\n");
+							//Tips(SocketManager.SHOW, dish.toString());
+						}
+					}
+
+
 				} catch (Exception e) {
 				}
 			}

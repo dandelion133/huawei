@@ -1,7 +1,13 @@
 package com.qian.activity;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Process;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +24,7 @@ import com.qian.R;
 import com.qian.fragment.HomePageFragment;
 import com.qian.fragment.MenuFragment;
 import com.qian.fragment.MyinfoFragment;
+import com.qian.service.SocketService;
 import com.qian.ui.TabIndicatorView;
 
 
@@ -42,6 +49,18 @@ public class HomeActivity extends AppCompatActivity {
 
     private boolean isFirstPress = false;
     private SharedPreferences sp;
+    public SocketService.MyBinder mBinder;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mBinder = (SocketService.MyBinder) service;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,9 +69,10 @@ public class HomeActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.home_toolbar);
 
        // toolbar.setNavigationIcon(R.mipmap.ic_launcher);//设置导航栏图标
-        toolbar.setLogo(R.mipmap.ic_launcher);//设置app logo
-        toolbar.setTitle("Title");//设置主标题
-        toolbar.setSubtitle("Subtitle");//设置子标题
+        toolbar.setLogo(R.drawable.logo);//设置app logo
+        toolbar.setTitle("点吧");//设置主标题
+        toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
+      //  toolbar.setSubtitle("Subtitle");//设置子标题
        // toolbar.inflateMenu(R.menu.menu_home);//设置右上角的填充菜单
         setSupportActionBar(toolbar);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -72,6 +92,20 @@ public class HomeActivity extends AppCompatActivity {
 
 
         initView();
+
+
+
+
+        Intent intent = new Intent(this, SocketService.class);
+        startService(intent);
+        boolean isSuccess = bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        if(isSuccess) {
+            Toast.makeText(this, "服务被成功绑定了", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "服务没有成功绑定", Toast.LENGTH_SHORT).show();
+        }
+
+
 
     }
 

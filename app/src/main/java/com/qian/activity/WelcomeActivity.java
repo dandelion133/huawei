@@ -39,7 +39,7 @@ public class WelcomeActivity extends Activity {
         Button send = (Button) findViewById(R.id.send);
 
 
-        mManager = new SocketManager(this);
+        mManager = SocketManager.getInstance(this);
         mManager.receiveMsg();
 
 
@@ -76,8 +76,8 @@ public class WelcomeActivity extends Activity {
         Msg msg = new Msg("qianhaifeng",
                 mManager.getLocalHostIp(),
                 "", "192.168.1.255",//改成255就是向局域网所有人一起发消息
-                SocketManager.CMD_SENDMSG,
-                "hahahahaha");
+               Msg.TEST,
+                "你大爷");
 
         //Toast.makeText(WelcomeActivity.this, msg+"2222", Toast.LENGTH_SHORT).show();
         mManager.sendMsg(msg);

@@ -8,28 +8,40 @@
     android:background="@drawable/grid_selector_background"
     android:orientation="vertical" >
 
-    <ImageView
-        android:layout_marginTop="30dp"
+    <com.qian.ui.SquareImageView
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:id="@+id/item_grid_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:scaleType="centerCrop"
 
-        android:src="@drawable/dish" >
-    </ImageView>
+        android:src="@drawable/dish" />
+
     <TextView
         android:layout_marginTop="5dp"
         android:id="@+id/tv_explain"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
    		android:gravity="center_horizontal"
-        android:text="证件照"
+        android:text="菜名"
         android:textSize="15sp"
         android:textColor="@color/dark_grey"
         android:singleLine="true"
         />
+    <TextView
+        android:layout_marginTop="3dp"
+        android:id="@+id/tv_price"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="价格"
+        android:textSize="15sp"
+        android:textColor="@color/red"
+        android:singleLine="true"
+        />
     <View
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 </LinearLayout>

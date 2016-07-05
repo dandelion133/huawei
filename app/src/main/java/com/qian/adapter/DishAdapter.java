@@ -50,26 +50,28 @@ public class DishAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
 
-        RecommendViewHolder holder = null;
+        DishViewHolder holder = null;
         if(convertView == null) {
-            holder = new RecommendViewHolder();
+            holder = new DishViewHolder();
             view = View.inflate(mContext, R.layout.item_grid,null);
             holder.dishImage = (ImageView) view.findViewById(R.id.item_grid_image);
             holder.dishName = (TextView) view.findViewById(R.id.tv_explain);
-
+            holder.dishPrice = (TextView) view.findViewById(R.id.tv_price);
 
             view.setTag(holder);
         } else {
             view = convertView;
-            holder = (RecommendViewHolder) view.getTag();
+            holder = (DishViewHolder) view.getTag();
         }
         holder.dishName.setText(mDishs.get(position).getName());
         holder.dishImage.setImageResource(mDishs.get(position).getImage());
+        holder.dishPrice.setText("￥:" + mDishs.get(position).getPrice());
         return view;
     }
 
-    public final class RecommendViewHolder {
+    public final class DishViewHolder {
         public ImageView dishImage;
         public TextView dishName;
+        public TextView dishPrice;
     }
 }

@@ -3,6 +3,13 @@ package com.qian.entity;
 import java.io.Serializable;
 
 public class Msg implements Serializable {
+
+
+	public static final int RESPONSE = 0;//应答消息
+	public static final int MENU_DATA = 1;//菜单数据
+	public static final int TEST = 2;//测试数据
+
+
 	private String sendUser;// 发送人 用户名
 	private String sendUserIp;// 发送人ip
 	private String receiveUser;// 接收人
