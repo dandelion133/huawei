@@ -1,8 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+                android:background="@color/pale"
+    >
+
+
+
+    <LinearLayout
+        android:id="@+id/seat_num"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <TextView
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="座位号"
+            android:textColor="@color/dark_grey"
+            android:textSize="20sp"
+            />
+        <EditText
+            android:id="@+id/seat_num_et"
+            android:inputType="phone"
+            android:layout_marginLeft="20dp"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:hint="请输入座位号"
+            android:background="@drawable/bg_edittext2"
+            />
+    </LinearLayout>
+    <View
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/seat_num"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/grey_pale"
+        />
+    <Button
+        android:id="@+id/submit_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="提交菜单"
+        android:textColor="@color/white"
+        android:background="@drawable/bg_button"
+
+        />
     <ListView
+        android:layout_marginTop="12dp"
+        android:layout_below="@id/seat_num"
+        android:layout_above="@id/submit_menu"
         android:id="@+id/menu_lv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -12,12 +63,5 @@
     </ListView>
 
 
-    <Button
-        android:id="@+id/submit_menu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="提交菜单"
 
-        />
 </RelativeLayout>

@@ -21,7 +21,7 @@ public class Dish implements Serializable {
     private int id;
     private int price;
     private int dishType;
-    private int count = 1;//点菜数量
+    private int count = 0;//点菜数量
 
     public int getCount() {
         return count;

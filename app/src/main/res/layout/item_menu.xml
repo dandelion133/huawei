@@ -14,14 +14,20 @@
         />
 
 
-    <ImageView
-
+    <com.qian.ui.SquareImageView
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:paddingBottom="3dp"
+        android:paddingTop="3dp"
         android:id="@+id/menu_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:src="@drawable/dish"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="10dp"
         android:layout_centerVertical="true"
+        android:background="@drawable/button_normal"
         />
     <TextView
 
@@ -29,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="菜名"
-        android:textSize="23sp"
+        android:textSize="15sp"
         android:layout_toRightOf="@id/menu_image"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="30dp"
@@ -40,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="￥：25"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:layout_marginTop="15dp"
         android:layout_marginLeft="30dp"
         android:textColor="@color/red"
@@ -48,44 +54,71 @@
         android:layout_below="@id/menu_name"
 
         />
+
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/menu_price"
+        android:orientation="vertical"
+        android:layout_toRightOf="@id/menu_image"
         android:layout_marginTop="15dp"
-        android:layout_marginLeft="30dp"
+        android:layout_marginLeft="110dp"
         android:layout_below="@id/menu_name"
-        android:orientation="horizontal"
         >
-        <TextView
-            android:id="@+id/dec"
-            android:background="@drawable/bg_button_white"
-            android:layout_width="30dp"
-            android:layout_height="35dp"
-            android:text="-"
-            android:gravity="center"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/grey_pale"
+
             />
-        <TextView
-            android:id="@+id/dish_num"
-            android:layout_width="40dp"
-            android:layout_height="30dp"
-            android:text="1"
-            android:gravity="center"
-            />
-        <TextView
-            android:id="@+id/add"
-            android:background="@drawable/bg_button_white"
-            android:layout_width="30dp"
-            android:layout_height="35dp"
-            android:text="+"
-            android:gravity="center"
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal"
+            >
+            <TextView
+                android:id="@+id/dec"
+                android:background="@drawable/bg_button_white"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:text="-"
+                android:gravity="center"
+                />
+            <TextView
+                android:id="@+id/dish_num"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:text="1"
+                android:gravity="center"
+                />
+            <TextView
+                android:id="@+id/add"
+                android:background="@drawable/bg_button_white"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:text="+"
+                android:gravity="center"
+                />
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/grey_pale"
+            android:layout_alignParentBottom="true"
             />
     </LinearLayout>
 
+
+
+
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/grey"
+        android:layout_height="0.5dp"
+        android:background="@color/grey_pale"
         android:layout_alignParentBottom="true"
         />
 </RelativeLayout>

@@ -90,20 +90,21 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-
-        initView();
-
-
-
-
         Intent intent = new Intent(this, SocketService.class);
         startService(intent);
         boolean isSuccess = bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         if(isSuccess) {
+            initView();
             Toast.makeText(this, "服务被成功绑定了", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "服务没有成功绑定", Toast.LENGTH_SHORT).show();
         }
+
+
+
+
+
+
 
 
 

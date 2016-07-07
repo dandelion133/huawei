@@ -1,6 +1,7 @@
 package com.qian.utils;
 
 import android.os.Environment;
+import android.util.Log;
 import android.util.Xml;
 
 import com.qian.entity.Dish;
@@ -29,7 +30,7 @@ public class XmlUtil {
      * @return  文件内容
      * @author 钱海峰
      */
-    public static String writeXmlToLocal(List<Dish> list) {
+    public static void writeXmlToLocal(List<Dish> list) {
 
 
       //  List<Dish> list = getDishList();
@@ -76,6 +77,7 @@ public class XmlUtil {
                 //写dishtype
                 serializer.startTag(null, "dishtype");//<dishType>
                 serializer.text(dish.getDishType() + "");
+                Log.i("XmlUtil",dish.getDishType() + " ");
                 serializer.endTag(null, "dishtype");//</dishType>
 
                 //count
@@ -95,29 +97,35 @@ public class XmlUtil {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } finally {
-            String result = "";
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(file));//构造一个BufferedReader类来读取文件
-                String s = null;
-                while ((s = br.readLine()) != null) {//使用readLine方法，一次读一行
-                    result = result  + s;
-                }
-                br.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return result;
         }
 
 
     }
 
 
+    public static String getStringXmlFromLocal() {
+
+        File file = new File(Environment.getExternalStorageDirectory(), "dish.xml");
+        String result = "";
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));//构造一个BufferedReader类来读取文件
+            String s = null;
+            while ((s = br.readLine()) != null) {//使用readLine方法，一次读一行
+                result = result  + s;
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+
 
     public static ArrayList<Dish> parserXmlFromLocal() {
         try {
-            File path = new File(Environment.getExternalStorageDirectory(), "person.xml");
+            File path = new File(Environment.getExternalStorageDirectory(), "dish.xml");
             FileInputStream fis = new FileInputStream(path);
 
             // 获得pull解析器对象
@@ -136,20 +144,32 @@ public class XmlUtil {
 
                 switch (eventType) {
                     case XmlPullParser.START_TAG: 		// 当前等于开始节点  <person>
-                        if("persons".equals(tagName)) {	// <persons>
+                        if("dishs".equals(tagName)) {	// <dishs>
                             dishList = new ArrayList<>();
-                        } else if("person".equals(tagName)) { // <person id="1">
-                          //  dish = new Dish();
-                          //  id = parser.getAttributeValue(null, "id");
-                          //  dish.setId(Integer.valueOf(id));
+                        } else if("dish".equals(tagName)) { // dish>
+                            dish = new Dish();
                         } else if("name".equals(tagName)) { // <name>
-                          //  dish.setName(parser.nextText());
-                        } else if("age".equals(tagName)) { // <age>
-                           // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setName(parser.nextText());
+                        } else if("image".equals(tagName)) { // <image>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setImage(Integer.parseInt(parser.nextText()));
+                        } else if("id".equals(tagName)) { // <id>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setId(Integer.parseInt(parser.nextText()));
+                        } else if("price".equals(tagName)) { // <price>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setPrice(Integer.parseInt(parser.nextText()));
+                        } else if("dishtype".equals(tagName)) { // <dishtype>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setDishType(Integer.parseInt(parser.nextText()));
+
+                        } else if("count".equals(tagName)) { // <count>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setCount(Integer.parseInt(parser.nextText()));
                         }
                         break;
-                    case XmlPullParser.END_TAG:		// </persons>
-                        if("person".equals(tagName)) {
+                    case XmlPullParser.END_TAG:		// </dish>
+                        if("dish".equals(tagName)) {
                             // 需要把上面设置好值的person对象添加到集合中
                             dishList.add(dish);
                         }
@@ -178,7 +198,7 @@ public class XmlUtil {
         }
         return null;
     }
-    public static List<Dish> parserXmlFromString(String str) {
+    public static ArrayList<Dish> parserXmlFromString(String str) {
         try {
            // File path = new File(Environment.getExternalStorageDirectory(), "person.xml");
         //    FileInputStream fis = new FileInputStream(path);
@@ -191,14 +211,14 @@ public class XmlUtil {
             //parser.set
             int eventType = parser.getEventType(); 		// 获得事件类型
 
-            List<Dish> dishList = null;
+            ArrayList<Dish> dishList = null;
             Dish dish = null;
             String id;
             while(eventType != XmlPullParser.END_DOCUMENT) {
                 String tagName = parser.getName();	// 获得当前节点的名称
 
                 switch (eventType) {
-                    case XmlPullParser.START_TAG: 		// 当前等于开始节点  <person>
+                    case XmlPullParser.START_TAG: 		// 当前等于开始节点
                         if("dishs".equals(tagName)) {	// <dishs>
                             dishList = new ArrayList<>();
                         } else if("dish".equals(tagName)) { // dish>
@@ -206,20 +226,15 @@ public class XmlUtil {
                         } else if("name".equals(tagName)) { // <name>
                               dish.setName(parser.nextText());
                         } else if("image".equals(tagName)) { // <image>
-                            // dish.setAge(Integer.parseInt(parser.nextText()));
                             dish.setImage(Integer.parseInt(parser.nextText()));
                         } else if("id".equals(tagName)) { // <id>
-                            // dish.setAge(Integer.parseInt(parser.nextText()));
                             dish.setId(Integer.parseInt(parser.nextText()));
                         } else if("price".equals(tagName)) { // <price>
-                            // dish.setAge(Integer.parseInt(parser.nextText()));
                             dish.setPrice(Integer.parseInt(parser.nextText()));
                         } else if("dishtype".equals(tagName)) { // <dishtype>
-                            // dish.setAge(Integer.parseInt(parser.nextText()));
                             dish.setDishType(Integer.parseInt(parser.nextText()));
                         } else if("count".equals(tagName)) { // <count>
-                            // dish.setAge(Integer.parseInt(parser.nextText()));
-                            dish.setDishType(Integer.parseInt(parser.nextText()));
+                            dish.setCount(Integer.parseInt(parser.nextText()));
                         }
                         break;
                     case XmlPullParser.END_TAG:		// </dish>

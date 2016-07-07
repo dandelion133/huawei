@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#303537</color>
+    <color name="colorPrimary">#616161</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="black1">#303537</color>
@@ -16,5 +16,6 @@
     <color name="line">#ffd3dde6</color>
     <color name="blue">#62aff3</color>
     <color name="green">#11cd6e</color>
-
+    <color name="button_focus">#e86252</color>
+    <color name="button_normal">@color/red</color>
 </resources>
