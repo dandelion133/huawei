@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
  * Created by QHF on 2016/7/7.
  */
 public class BossActivity extends AppCompatActivity {
+    private static final String TAG = "BossActivity";
     private OrderAdapter mAdapter;
 
     public SocketService.MyBinder mBinder;
@@ -42,7 +44,17 @@ public class BossActivity extends AppCompatActivity {
             mBinder = (SocketService.MyBinder) service;
             mMyMenus = mBinder.getMenus();
             mAdapter.notifyDataSetChanged();
-        //    Toast.makeText(BossActivity.this,(mBinder == null) + "",Toast.LENGTH_SHORT).show();
+            /*SerializableUtil.writeToLocal(mMyMenus,BossActivity.this,"bossMenu");
+            ArrayList<MyMenu> menuss  = (ArrayList<MyMenu>) SerializableUtil.parseFromLocal(BossActivity.this,"bossMenu");
+            if(menuss != null) {
+                Log.e(TAG,mMyMenus.toString());
+                Log.e(TAG,menuss.toString());
+                Log.e(TAG,menuss.toString().equals(mMyMenus.toString()) + "");
+            } else {
+                Log.e(TAG,"序列化为null");
+            }*/
+
+            //    Toast.makeText(BossActivity.this,(mBinder == null) + "",Toast.LENGTH_SHORT).show();
 
         }
 
@@ -90,11 +102,11 @@ public class BossActivity extends AppCompatActivity {
 
 
 
-        Intent intent = new Intent(this, SocketService.class);
+        final Intent intent = new Intent(this, SocketService.class);
         startService(intent);
         boolean isSuccess = bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         if(isSuccess) {
-          //  initView();
+            //  initView();
             Toast.makeText(this, "服务被成功绑定了", Toast.LENGTH_SHORT).show();
             ListView listView = (ListView) findViewById(R.id.orders);
 
@@ -102,7 +114,18 @@ public class BossActivity extends AppCompatActivity {
             mAdapter = new OrderAdapter();
             listView.setAdapter(mAdapter);
 
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    MyMenu menu = mMyMenus.get(position);
+                    Intent intent = new Intent(BossActivity.this,MenuActivity.class);
 
+                    intent.putExtra("menu", menu);
+                //    unbindService(mConnection);
+                    startActivityForResult(intent,position);
+
+                }
+            });
             receiver = new DataChangeReceiver();
             IntentFilter filter = new IntentFilter();
             String action = "com.qian.bossMenu";
@@ -123,6 +146,32 @@ public class BossActivity extends AppCompatActivity {
 
 
 
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        mMyMenus.get(requestCode).setStatus(data.getIntExtra("status",MyMenu.WAITTING));
+        mAdapter.notifyDataSetChanged();
+        mBinder.setMyMenu(mMyMenus);
+
+        /*ArrayList<MyMenu> menuss  = (ArrayList<MyMenu>) SerializableUtil.parseFromLocal(BossActivity.this,"bossMenu");
+        if(menuss != null) {
+            Log.e(TAG,mMyMenus.toString());
+            Log.e(TAG,menuss.toString());
+            Log.e(TAG,menuss.toString().equals(mMyMenus.toString()) + "");
+        } else {
+            Log.e(TAG,"序列化为null");
+        }*/
 
     }
 
@@ -167,6 +216,7 @@ public class BossActivity extends AppCompatActivity {
                 holder.ordeImage = (ImageView) view.findViewById(R.id.order_image);
                 holder.seatNum = (TextView) view.findViewById(R.id.seat_num_order);
                 holder.price = (TextView) view.findViewById(R.id.order_price);
+                holder.status = (TextView) view.findViewById(R.id.status);
                 view.setTag(holder);
             } else {
                 view = convertView;
@@ -176,7 +226,13 @@ public class BossActivity extends AppCompatActivity {
             holder.ordeImage.setImageResource(mMyMenus.get(position).getDishs().get(0).getImage());
             holder.seatNum.setText(mMyMenus.get(position).getSeatNum() + "号桌");
             holder.price.setText("合计：￥"+mMyMenus.get(position).getAllPrice());
-
+            if(mMyMenus.get(position).getStatus() == MyMenu.OK) {
+                holder.status.setText("已完成");
+            } else if(mMyMenus.get(position).getStatus() == MyMenu.STARTING) {
+                holder.status.setText("正在上菜");
+            } if(mMyMenus.get(position).getStatus() == MyMenu.WAITTING) {
+                holder.status.setText("等待中.....");
+            }
 
             return view;
         }
@@ -186,7 +242,7 @@ public class BossActivity extends AppCompatActivity {
         public ImageView ordeImage;
         public TextView seatNum;
         public TextView price;
-
+        public TextView status;
 
 
     }
@@ -198,6 +254,15 @@ public class BossActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             mMyMenus = mBinder.getMenus();
             mAdapter.notifyDataSetChanged();
+            /*SerializableUtil.writeToLocal(mMyMenus,BossActivity.this,"bossMenu");
+            ArrayList<MyMenu> menuss  = (ArrayList<MyMenu>) SerializableUtil.parseFromLocal(BossActivity.this,"bossMenu");
+            if(menuss != null) {
+                Log.e(TAG,mMyMenus.toString());
+                Log.e(TAG,menuss.toString());
+                Log.e(TAG,menuss.toString().equals(mMyMenus.toString()) + "");
+            } else {
+                Log.e(TAG,"序列化为null");
+            }*/
         }
 
     }

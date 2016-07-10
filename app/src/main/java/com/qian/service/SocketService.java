@@ -12,8 +12,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.qian.entity.Dish;
-import com.qian.entity.MyMenu;
 import com.qian.entity.Msg;
+import com.qian.entity.MyMenu;
+import com.qian.entity.SendedMenu;
+import com.qian.utils.SerializableUtil;
 import com.qian.utils.XmlUtil;
 
 import org.apache.http.conn.util.InetAddressUtils;
@@ -37,12 +39,13 @@ public class SocketService extends Service {
 
 
 
+    private ArrayList<SendedMenu> sendedMenu = new ArrayList<>();//已发送的菜单
 
 
-
+    //点菜的列表
     private ArrayList<Dish> mDishs = new ArrayList<>();
-
-    private ArrayList<MyMenu> mMyMenus = new ArrayList<>();
+    //老板端的列表
+    private ArrayList<MyMenu> bossMenus = new ArrayList<>();//用于老板端
 
     private  SharedPreferences sp;
 
@@ -50,6 +53,10 @@ public class SocketService extends Service {
     public static final int PORT_RECEIVE = 2425;// 接收端口
     // 消息命令
     public static final int SHOW = 8000;// 显示消息
+
+    //定义发送接收ip地址
+    public static final String  receiveIP = "192.168.1.107";
+    public static final String  sendIP = "192.168.1.102";
 
 
    // private SelectedDish selectedDish;
@@ -65,7 +72,7 @@ public class SocketService extends Service {
         sp = getSharedPreferences("config", Context.MODE_PRIVATE);
         receiveMsg();
 
-        mMyMenus = new ArrayList<>();
+        bossMenus = new ArrayList<>();
 
         ArrayList<Dish> dishs =  XmlUtil.parserXmlFromLocal();
         Log.e("SocketService",dishs.toString());
@@ -73,9 +80,13 @@ public class SocketService extends Service {
             setDishs(dishs);
         }
 
+        bossMenus  = (ArrayList<MyMenu>) SerializableUtil.parseFromLocal(this,"bossMenu");
+
     }
 
-
+    /**
+     * 返回的Binder对象
+     */
     public class MyBinder extends Binder {
 
         public void sendMsg(Msg msg) {
@@ -91,20 +102,50 @@ public class SocketService extends Service {
         public ArrayList<Dish> getDishList() {
             return getDishs();
         }
+
+        public void setDishList(ArrayList<Dish> dishList) {
+            mDishs = dishList;
+            XmlUtil.writeXmlToLocal(mDishs);
+        }
+
         public void deleteDishs(Dish dish) {
             deleteDish(dish);
         }
         public ArrayList<MyMenu> getMenus() {
-            return mMyMenus;
+            return bossMenus;
+        }
+
+        public void setMyMenu(ArrayList<MyMenu> menuArrayList) {
+            bossMenus = menuArrayList;
+            SerializableUtil.writeToLocal(bossMenus,SocketService.this,"bossMenu");
         }
 
         public int getSumPrice() {
             return getAllPrice();
         }
+
+        public ArrayList<SendedMenu> getSendedMenu() {
+            return sendedMenu;
+        }
+
+        public void setSendedMenu(ArrayList<SendedMenu> sendedMenu1) {
+            sendedMenu = sendedMenu1;
+        }
+        public void addSendedMenu(SendedMenu menu) {
+            sendedMenu.add(menu);
+            XmlUtil.writeSendedMenuXmlToLocal(sendedMenu,"sendedMenu");
+        }
+
+
+
+
     }
 
 
-
+    /**
+     * 获取已提交的菜的数量，估计大约时间
+     * @return
+     */
 
     private int getAllPrice() {
         int sum = 0;
@@ -114,7 +155,11 @@ public class SocketService extends Service {
         return sum;
     }
 
-
+    /**
+     * 这只提交菜的数量
+     * @param dish
+     * @param count
+     */
     public void setDishCount(Dish dish,int count) {
         for (Dish mDish:mDishs) {
             // Log.e(Tag,mDish.getDishType() + "--" + dish.getDishType());
@@ -135,6 +180,11 @@ public class SocketService extends Service {
 
 
     }
+
+    /**
+     * 向列表中添加菜
+     * @param dish
+     */
     public void addDish(Dish dish) {
 
         //  Log.e(Tag,"添加");
@@ -150,6 +200,12 @@ public class SocketService extends Service {
         edit.apply();
 
     }
+
+    /**
+     * 菜单中是否含有该菜
+     * @param dish
+     * @return
+     */
     private boolean isHaved(Dish dish) {
         for (Dish mDish:mDishs) {
             // Log.e(Tag,mDish.getDishType() + "--" + dish.getDishType());
@@ -163,6 +219,11 @@ public class SocketService extends Service {
         }
         return false;
     }
+
+    /**
+     * 删除该菜
+     * @param dish
+     */
     public void deleteDish(Dish dish) {
         for (Dish mDish:mDishs) {
             if(mDish.getDishType() == dish.getDishType()) {
@@ -233,8 +294,13 @@ public class SocketService extends Service {
         }
     }*/
 
+    /**
+     * 发送消息线程
+     * @param msg
+     */
     // 发送消息
     public void sendSocketMsg(Msg msg) {
+        Tips(SocketService.SHOW, "发送数据");
         (new UdpSend(msg)).start();
     }
 
@@ -263,6 +329,9 @@ public class SocketService extends Service {
         }
     }
 
+    /**
+     * 接受线程  一直运行
+     */
     // 接收消息
     public void receiveMsg() {
         new UdpReceive().start();
@@ -289,39 +358,81 @@ public class SocketService extends Service {
                     System.arraycopy(data, 0, data2, 0, data2.length);// 得到接收的数据
                     Msg msg = (Msg) SocketService.toObject(data2);
                     ds.close();
-
-                    //Log.e
-                    //	Tips(SocketManager.SHOW, msg.getSendUser()+""+msg.getSendUserIp() + " 发来消息！" + msg.getBody().toString());
+                    //用于老板端  收到消息后   会返回一个RESPONSE
                     if(msg.getMsgType() == Msg.MENU_DATA) {
                         String msgData = msg.getBody().toString();
                         Log.e("receiveMsgmsg.getBody()",msgData);
                         String[] datas = msgData.split("division");
+
+
                         Tips(SocketService.SHOW, datas[0]);
                         Tips(SocketService.SHOW, "座位号"+ datas[1]);
                         Tips(SocketService.SHOW, "合计"+ datas[2]);
+
+
                         ArrayList<Dish> list =  XmlUtil.parserXmlFromString(datas[0]);
 
-                        MyMenu myMenu = new MyMenu(list,datas[1],datas[2]);
-                        mMyMenus.add(myMenu);
-
-
+                        MyMenu myMenu = new MyMenu(list,datas[1],datas[2],msg.getSendUserIp(),MyMenu.WAITTING);
+                        bossMenus.add(myMenu);
+                        SerializableUtil.writeToLocal(bossMenus,SocketService.this,"bossMenu");
+                       // ArrayList<MyMenu> menuss  = (ArrayList<MyMenu>) SerializableUtil.parseFromLocal(this,"bossMenu");
+                        //发广播更新界面
                         Intent intent = new Intent();
                         intent.setAction("com.qian.bossMenu");
                         intent.putExtra("isChange",true);//防止返回也会修改
-                        /*intent.putExtra("name", mName);
-                        intent.putExtra("mail", mMail);
-                        intent.putExtra("bankCardNum", mBankCardNum);
-                        intent.putExtra("IdCardNum", mIdCardNum);
-                        intent.putExtra("bankCardType", mBankCardType);*/
                         sendBroadcast(intent);
 
 
-                        //	Tips(SocketManager.SHOW, "座位号"+ datas[1]);
                         Log.e("receiveMsgParseXml",list.toString());
                         for(Dish dish : list) {
                             Log.e("receiveMsg",dish.toString()+"");
                             //Tips(SocketManager.SHOW, dish.toString());
                         }
+                        //获得大约等待时间
+                        int allDishNum = 0;
+                        for(int j = 0;j < bossMenus.size() - 1; j ++) {
+
+                            ArrayList<Dish> dishs = bossMenus.get(j).getDishs();
+                            for(int i = 0;i < dishs.size();i ++) {
+                                allDishNum += dishs.get(i).getCount();
+                            }
+                        }
+                        //返回应答信号
+                        Msg msg1 = new Msg("boss",
+                                getLocalHostIp(),
+                                "", sendIP,//目标IP
+                                Msg.MENU_RESPONSE,
+                                allDishNum + "");//等待时间返回
+                        Log.e("SocketService","发送应答信号");
+                        sendSocketMsg(msg1);
+                    } else if(msg.getMsgType() == Msg.MENU_RESPONSE && !msg.getSendUserIp().equals(getLocalHostIp()) ) {
+
+                        Tips(SocketService.SHOW, "收到应答信号" + msg.getBody().toString());
+                      //  Log.e("SocketService","收到应答信号");
+
+                        MyMenu menu = new MyMenu(mDishs,sp.getString("seatNum", ""), getAllPrice()+ "");
+                     //   Log.e("SocketService",mDishs.toString());
+                        String waitTime = msg.getBody().toString();///intent.getStringExtra("waitTime");
+                        SendedMenu sendedMenu1 = new SendedMenu(menu,waitTime);
+
+                        sendedMenu.add(sendedMenu1);
+                   //     Log.e("SocketService序列化前",sendedMenu.toString());
+                        XmlUtil.writeSendedMenuXmlToLocal(sendedMenu,"sendedMenu");
+                   //     sendedMenu = XmlUtil.parserXmlFromLocal("sendedMenu");
+                   //     Log.e("SocketService序列化后",sendedMenu.toString());
+
+                        //发广播更新界面
+                        Intent intent = new Intent();
+                        intent.setAction("com.qian.sendSuccess");
+                        intent.putExtra("waitTime",msg.getBody().toString());//防止返回也会修改
+                        sendBroadcast(intent);
+
+                    } else if(msg.getMsgType() == Msg.START_DISH) {
+                        //发广播更新界面
+                        Intent intent = new Intent();
+                        intent.setAction("com.qian.startDish");
+                        intent.putExtra("status",msg.getBody().toString());//防止返回也会修改
+                        sendBroadcast(intent);
                     }
 
 
@@ -333,8 +444,10 @@ public class SocketService extends Service {
     }
 
 
-
-
+    /**
+     * 得到广播的IP地址
+     * @return
+     */
 
 
 
@@ -348,7 +461,7 @@ public class SocketService extends Service {
     }
 
     // 获取本机IP
-    public  String getLocalHostIp() {
+    public static String getLocalHostIp() {
         String ipaddress = "";
         try {
             Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();

@@ -12,7 +12,6 @@ import com.qian.R;
 import com.qian.activity.HomeActivity;
 import com.qian.adapter.DishAdapter;
 import com.qian.entity.Dish;
-import com.qian.service.SocketService;
 
 import java.util.ArrayList;
 
@@ -24,7 +23,6 @@ public class RecommendFoodFragment extends Fragment {
 
     private static final String TAG = "RecommendFoodFragment";
     private DishAdapter mAdapter;
-    private SocketService.MyBinder binder;
   /*  private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -38,6 +36,7 @@ public class RecommendFoodFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
         View view = View.inflate(getActivity(), R.layout.recommend_fragment, null);
+
 
 
        /* final int[] images = new int[]{R.drawable.fish,R.drawable.red_pig,R.drawable.chicken};

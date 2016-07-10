@@ -12,7 +12,6 @@ import android.os.Process;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -31,7 +30,7 @@ import com.qian.ui.TabIndicatorView;
 public class HomeActivity extends AppCompatActivity {
     //定义FragmentTabHost对象
     private FragmentTabHost mTabHost;
-
+   // public static HomeActivity instance;
     //static Activity activity1;//只是为了取得HomeActivity的引用，后面可能会用
     //定义数组来存放Fragment界面
     private Class fragmentArray[] = {HomePageFragment.class,MenuFragment.class, MyinfoFragment.class};
@@ -43,13 +42,11 @@ public class HomeActivity extends AppCompatActivity {
     //设置文字的颜色
 
     //Tab选项卡的文字
-    private String mTextviewArray[] = {"首页", "我的菜单", "我的信息"};
+    private String mTextviewArray[] = {"首页", "我的菜单", "我的订单"};
     private TabIndicatorView[] mTabIndicatorView = new TabIndicatorView[3];
-    private GestureDetector detector;
-
     private boolean isFirstPress = false;
     private SharedPreferences sp;
-    public SocketService.MyBinder mBinder;
+    public  SocketService.MyBinder mBinder;
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -65,7 +62,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
+      //  instance = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.home_toolbar);
 
        // toolbar.setNavigationIcon(R.mipmap.ic_launcher);//设置导航栏图标
@@ -208,5 +205,9 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
     }
 
-
+    @Override
+    protected void onDestroy() {
+    //    instance = null;
+        super.onDestroy();
+    }
 }

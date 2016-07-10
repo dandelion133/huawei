@@ -27,7 +27,8 @@
         <activity android:name=".activity.HomeActivity"/>
         <service android:name=".service.SocketService"/>
         <activity android:name=".activity.BossActivity"/>
-
+        <activity android:name=".activity.MenuActivity"/>
+        <activity android:name=".activity.MenuCustomerActivity"/>
     </application>
 
 </manifest>

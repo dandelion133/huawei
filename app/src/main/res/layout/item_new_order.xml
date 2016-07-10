@@ -2,17 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:background="@drawable/bg_button2"
-                android:layout_height="70dp">
+                android:layout_height="100dp">
 
-    <ImageView
-        android:id="@+id/see_more"
-        android:layout_width="30dp"
-        android:layout_height="match_parent"
-        android:src="@drawable/arrow"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
 
-        />
 
 
     <com.qian.ui.SquareImageView
@@ -22,9 +14,9 @@
         android:paddingRight="3dp"
         android:paddingBottom="3dp"
         android:paddingTop="3dp"
-        android:id="@+id/order_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:id="@+id/new_order_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:src="@drawable/dish"
         android:layout_marginLeft="10dp"
         android:layout_centerVertical="true"
@@ -32,18 +24,18 @@
         />
     <TextView
 
-        android:id="@+id/seat_num_order"
+        android:id="@+id/seat_num_new_order"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="菜名"
+        android:text="桌位号"
         android:textSize="15sp"
-        android:layout_toRightOf="@id/order_image"
+        android:layout_toRightOf="@id/new_order_image"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="30dp"
         android:textColor="@color/black1"
         />
     <TextView
-        android:id="@+id/order_price"
+        android:id="@+id/my_order_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="合计：￥25"
@@ -51,23 +43,45 @@
         android:layout_marginTop="10dp"
         android:layout_marginLeft="30dp"
         android:textColor="@color/red"
-        android:layout_toRightOf="@id/order_image"
-        android:layout_below="@id/seat_num_order"
+        android:layout_toRightOf="@id/seat_num_new_order"
 
         />
 
-
     <TextView
-        android:id="@+id/status"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="20dp"
-        android:layout_toLeftOf="@id/see_more"
-        android:text="点击查看详情"
-        android:textColor="@color/green"
-        android:layout_centerVertical="true"
+        android:id="@+id/order_desc"
+        android:text="订单大概信息"
+        android:textColor="@color/grey"
+        android:layout_below="@id/seat_num_new_order"
+        android:layout_toRightOf="@id/new_order_image"
+        android:layout_marginLeft="30dp"
 
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:id="@+id/confim_order"
+        android:text="订单已确认"
+        android:textColor="@color/green"
+        android:layout_below="@id/order_desc"
+        android:layout_toRightOf="@id/new_order_image"
+        android:layout_marginLeft="30dp"
+
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:id="@+id/waitting_time"
+        android:text="您大约需要等待10分钟"
+        android:textColor="@color/green"
+        android:layout_below="@id/order_desc"
+        android:layout_toRightOf="@id/confim_order"
+        android:layout_marginLeft="10dp"
         >
 
     </TextView>

@@ -7,6 +7,8 @@ import java.io.Serializable;
  */
 public class Dish implements Serializable {
 
+    private static final long serializableVersionUID = 1L;
+
     public static final int RECOMMEND = 0;//推荐
     public static final int MEAT = 1;//荤菜
     public static final int VEGETABLE = 2;//素菜

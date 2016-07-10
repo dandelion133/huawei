@@ -1,6 +1,9 @@
 package com.qian.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.qian.R;
 import com.qian.activity.HomeActivity;
@@ -45,6 +49,8 @@ public class MenuFragment extends Fragment {
   //  private SocketManager mManager = null;
     private  SharedPreferences sp;
     private Button mSubmitMenu;
+    private DataChangeReceiver mReceiver;
+    private String mMsgStr;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -82,36 +88,37 @@ public class MenuFragment extends Fragment {
         ListView listView = (ListView) view.findViewById(R.id.menu_lv);
 
         binder = ((HomeActivity) getActivity()).mBinder;
-        ArrayList<Dish> dishList = binder.getDishList();
+       // ArrayList<Dish> dishList = binder.getDishList();
 
         //Log.e(Tag,dishList.toString());
        /* for (Dish dish : dishList) {
             Log.e(Tag, dish + "");
         }*/
-        mAdapter = new MenuAdapter(getActivity(), dishList);
+        mAdapter = new MenuAdapter(getActivity(), binder.getDishList());
         listView.setAdapter(mAdapter);
       //  final int sumPrice = binder.getSumPrice();
 
-        final ArrayList<Dish> list = dishList;
+     //   final ArrayList<Dish> list = dishList;
 
      //   mManager = SocketManager.getInstance(getActivity());
         mSubmitMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
             //    Toast.makeText(getActivity(),"提交菜单",Toast.LENGTH_SHORT).show();
-                String msgStr = XmlUtil.getStringXmlFromLocal();//读取
+                //读取
+                mMsgStr = XmlUtil.getStringXmlFromLocal();
 
-                msgStr = msgStr + "division" + sp.getString("seatNum","")  + "division" + binder.getSumPrice() ;
+                mMsgStr = mMsgStr + "division" + sp.getString("seatNum","")  + "division" + binder.getSumPrice() ;
                 SharedPreferences.Editor edit = sp.edit();
                 edit.putBoolean("isModified", false);
                 edit.apply();
 
                 Msg msg = new Msg("qianhaifeng",
                         getLocalHostIp(),
-                        "", "192.168.1.255",//改成255就是向局域网所有人一起发消息
+                        "", SocketService.receiveIP,//改成255就是向局域网所有人一起发消息
                         Msg.MENU_DATA,
-                        msgStr);
-                    Log.e(Tag, msgStr);
+                        mMsgStr);
+                    Log.e(Tag, mMsgStr);
 
                 binder.sendMsg(msg);
 
@@ -120,19 +127,57 @@ public class MenuFragment extends Fragment {
                // mManager.sendMsg(msg);
             }
         });
-
+        mReceiver = new DataChangeReceiver();
+       // receiver = new DataChangeReceiver();
+        IntentFilter filter = new IntentFilter();
+        String action = "com.qian.sendSuccess";
+        filter.addAction(action);
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+       // registerReceiver(receiver, filter);
+        getActivity().registerReceiver(mReceiver,filter);
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        getActivity().unregisterReceiver(mReceiver);
+        mReceiver = null;
+        super.onDestroy();
     }
 
 
 
-  /*  public int getAllPrice(ArrayList<Dish> dishs) {
-        int sum = 0;
-        for (Dish dish:dishs) {
-            sum += dish.getCount() * dish.getPrice();
+    private class DataChangeReceiver  extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+        //    mMail = intent.getStringExtra("mail");
+         //   mBankCardNum = intent.getStringExtra("bankCardNum");
+
+            /*MyMenu menu = new MyMenu(binder.getDishList(),sp.getString("seatNum", ""),binder.getSumPrice() + "");
+            String waitTime = intent.getStringExtra("waitTime");
+            SendedMenu sendedMenu = new SendedMenu(menu,waitTime);
+            binder.addSendedMenu(sendedMenu);//添加到已提交菜单中*/
+            binder.setDishList(new ArrayList<Dish>());//设置菜单为空
+            mAdapter.notifyDataSetChanged();
+            Log.e(Tag,"收到应答");
+           /* ArrayList<SendedMenu> sendedMenu1 = XmlUtil.parserXmlFromLocal("sendedMenu");
+            binder.getSendedMenu();
+            Log.e(Tag,""+binder.getSendedMenu().toString());
+            Log.e(Tag,""+sendedMenu1.toString());
+            Log.e(Tag,""+binder.getSendedMenu().toString().equals(sendedMenu1.toString()));*/
+
+
+
+
+           // mMyMenus = mBinder.getMenus();
+          //  mAdapter.notifyDataSetChanged();
+            Toast.makeText(MenuFragment.this.getActivity(), "接受成功", Toast.LENGTH_SHORT).show();
         }
-        return sum;
-    }*/
+
+    }
 
 
     public  String getLocalHostIp() {
@@ -191,6 +236,8 @@ public class MenuFragment extends Fragment {
 
         @Override
         public int getCount() {
+            mDishs = binder.getDishList();
+            mSubmitMenu.setText("提交菜单" + "(合计" + binder.getSumPrice() + "元)");
             return mDishs.size();
         }
 

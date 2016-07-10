@@ -57,7 +57,7 @@ public class WelcomeActivity extends Activity {
         switch (view.getId()) {
             case R.id.customer:
                 startActivity(new Intent(this,HomeActivity.class));
-                finish();
+              //  finish();
                 break;
             case R.id.boss:
                 startActivity(new Intent(this,BossActivity.class));

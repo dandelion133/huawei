@@ -5,6 +5,8 @@ import android.util.Log;
 import android.util.Xml;
 
 import com.qian.entity.Dish;
+import com.qian.entity.MyMenu;
+import com.qian.entity.SendedMenu;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlSerializer;
@@ -52,7 +54,7 @@ public class XmlUtil {
             //写开始 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
             serializer.startDocument("utf-8", true);
 
-            serializer.startTag(null, "dishs");//<persons>
+            serializer.startTag(null, "dishs");//<dishs>
             for(Dish dish : list) {
                 serializer.startTag(null, "dish");//<dish>
                 //写name
@@ -102,7 +104,109 @@ public class XmlUtil {
 
     }
 
+    public static void writeSendedMenuXmlToLocal(List<SendedMenu> list,String fileName) {
 
+
+        //  List<Dish> list = getDishList();
+
+        //获取序列化对象
+        XmlSerializer serializer = Xml.newSerializer();
+
+
+        File file = null;
+
+        try {
+
+            file = new File(Environment.getExternalStorageDirectory(), fileName + ".xml");
+
+            FileOutputStream fos = new FileOutputStream(file);
+            //设置输出路径
+            serializer.setOutput(fos, "utf-8");
+            //开始写
+            //写开始 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+            serializer.startDocument("utf-8", true);
+
+            serializer.startTag(null, "sendedmenus");//<sendedmenus>
+            for(SendedMenu menu : list) {
+                serializer.startTag(null, "sendedmenu");//<sendedmenu>
+                //写name
+                serializer.startTag(null, "menu");//<menu>
+
+                serializer.startTag(null, "dishs");//<dishs>
+
+                for(Dish dish:menu.getMenu().getDishs()) {
+                    serializer.startTag(null, "dish");//<dish>
+                    //写name
+                    serializer.startTag(null, "name");//<name>
+                    serializer.text(dish.getName());
+                    serializer.endTag(null, "name");//</name>
+                    //写image
+                    serializer.startTag(null, "image");//<image>
+                    serializer.text(dish.getImage() + "");
+                    serializer.endTag(null, "image");//</image>
+
+                    //写ID
+                    serializer.startTag(null, "id");//<id>
+                    serializer.text(dish.getId() + "");
+                    serializer.endTag(null, "id");//</id>
+
+                    //写Price
+                    serializer.startTag(null, "price");//<price>
+                    serializer.text(dish.getPrice() + "");
+                    serializer.endTag(null, "price");//</price>
+
+                    //写dishtype
+                    serializer.startTag(null, "dishtype");//<dishType>
+                    serializer.text(dish.getDishType() + "");
+                    Log.i("XmlUtil",dish.getDishType() + " ");
+                    serializer.endTag(null, "dishtype");//</dishType>
+
+                    //count
+                    serializer.startTag(null, "count");//<count>
+                    serializer.text(dish.getCount() + "");
+                    serializer.endTag(null, "count");//</count>
+
+                    serializer.endTag(null, "dish");//</dish>
+                }
+                //serializer.text(dish.getCount() + "");
+                serializer.endTag(null, "dishs");//</dishs>
+
+                serializer.startTag(null, "allprice");//<allprice>
+                serializer.text(menu.getMenu().getAllPrice());
+                serializer.endTag(null, "allprice");//</allprice>
+                serializer.startTag(null, "seatnum");//<seatnum>
+                serializer.text(menu.getMenu().getSeatNum());
+                serializer.endTag(null, "seatnum");//</seatnum>
+
+
+
+                //serializer.text(dish.getName());
+                serializer.endTag(null, "menu");//</menu>
+
+
+
+
+                //count
+                serializer.startTag(null, "waittime");//<waittime>
+                serializer.text(menu.getWaittingTime());
+                serializer.endTag(null, "waittime");//</waittime>
+
+                serializer.endTag(null, "sendedmenu");//</sendedmenu>
+            }
+
+
+            serializer.endTag(null, "sendedmenus");//</sendedmenus>
+            serializer.endDocument();//文件结束
+
+
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+    }
     public static String getStringXmlFromLocal() {
 
         File file = new File(Environment.getExternalStorageDirectory(), "dish.xml");
@@ -120,7 +224,100 @@ public class XmlUtil {
         return result;
     }
 
+    public static ArrayList<SendedMenu> parserXmlFromLocal(String fileName) {
+        try {
+            File path = new File(Environment.getExternalStorageDirectory(), fileName + ".xml");
+            FileInputStream fis = new FileInputStream(path);
 
+            // 获得pull解析器对象
+            XmlPullParser parser = Xml.newPullParser();
+            // 指定解析的文件和编码格式
+            parser.setInput(fis, "utf-8");
+            //parser.
+            //parser.set
+            int eventType = parser.getEventType(); 		// 获得事件类型
+
+            ArrayList<SendedMenu> sendedMenuList = null;
+            SendedMenu sendedMenu = null;
+            MyMenu myMenu = null;
+            ArrayList<Dish> dishList = null;
+            Dish dish = null;
+            String id;
+            while(eventType != XmlPullParser.END_DOCUMENT) {
+                String tagName = parser.getName();	// 获得当前节点的名称
+
+                switch (eventType) {
+                    case XmlPullParser.START_TAG: 		// 当前等于开始节点  <person>
+
+                        if("sendedmenus".equals(tagName)) {
+                            sendedMenuList = new ArrayList<>();
+                        } else if("sendedmenu".equals(tagName)) {
+                            sendedMenu = new SendedMenu();
+                        } else if("menu".equals(tagName)) {
+                            myMenu = new MyMenu();
+                        } else if("dishs".equals(tagName)) {
+                            dishList = new ArrayList<>();
+                        }  else if("dish".equals(tagName)) { // dish>
+                            dish = new Dish();
+                        } else if("name".equals(tagName)) { // <name>
+                            dish.setName(parser.nextText());
+                        } else if("image".equals(tagName)) { // <image>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setImage(Integer.parseInt(parser.nextText()));
+                        } else if("id".equals(tagName)) { // <id>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setId(Integer.parseInt(parser.nextText()));
+                        } else if("price".equals(tagName)) { // <price>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setPrice(Integer.parseInt(parser.nextText()));
+                        } else if("dishtype".equals(tagName)) { // <dishtype>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setDishType(Integer.parseInt(parser.nextText()));
+
+                        } else if("count".equals(tagName)) { // <count>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            dish.setCount(Integer.parseInt(parser.nextText()));
+                        } else if("allprice".equals(tagName)) { // <count>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            myMenu.setAllPrice(parser.nextText());
+                        } else if("seatnum".equals(tagName)) { // <count>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            myMenu.setSeatNum(parser.nextText());
+                        } else if("waittime".equals(tagName)) { // <count>
+                            // dish.setAge(Integer.parseInt(parser.nextText()));
+                            sendedMenu.setWaittingTime(parser.nextText());
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:		// </dish>
+                        if("dish".equals(tagName)) {
+                            // 需要把上面设置好值的person对象添加到集合中
+                            dishList.add(dish);
+                        } else if("dishs".equals(tagName)) {
+                            // 需要把上面设置好值的person对象添加到集合中
+                            //dishList.add(dish);
+                            myMenu.setDishs(dishList);
+                        } else if("menu".equals(tagName)) {
+                            // 需要把上面设置好值的person对象添加到集合中
+                            //dishList.add(dish);
+                            sendedMenu.setMenu(myMenu);
+                        } else if("sendedmenu".equals(tagName)) {
+                            // 需要把上面设置好值的person对象添加到集合中
+                            //dishList.add(dish);
+                            sendedMenuList.add(sendedMenu);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                eventType = parser.next();		// 获得下一个事件类型
+            }
+            return sendedMenuList;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
     public static ArrayList<Dish> parserXmlFromLocal() {

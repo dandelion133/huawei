@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="100dp">
+
+
+    <com.qian.ui.SquareImageView
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:paddingBottom="3dp"
+        android:paddingTop="3dp"
+        android:id="@+id/menu_image_boss"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/dish"
+        android:layout_marginLeft="10dp"
+        android:layout_centerVertical="true"
+        android:background="@drawable/button_normal"
+        />
+
+
+    <LinearLayout
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:layout_centerVertical="true"
+        >
+        <TextView
+            android:id="@+id/dish_name_boss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="菜名"
+            android:textSize="17sp"
+            android:textColor="@color/black1"
+            />
+
+
+        <TextView
+            android:id="@+id/menu_price_boss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="单价：￥25"
+            android:textSize="15sp"
+            android:layout_marginTop="15dp"
+            android:textColor="@color/red"
+            />
+        <TextView
+            android:id="@+id/dish_num_boss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="数量：  x  2"
+            android:textSize="15sp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/red"
+            />
+    </LinearLayout>
+
+
+
+
+
+
+
+
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/grey_pale"
+        android:layout_alignParentBottom="true"
+        />
+</RelativeLayout>
+
