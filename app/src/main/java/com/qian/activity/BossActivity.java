@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -19,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,9 +36,9 @@ import java.util.ArrayList;
 public class BossActivity extends AppCompatActivity {
     private static final String TAG = "BossActivity";
     private OrderAdapter mAdapter;
-
+    private SharedPreferences sp;
     public SocketService.MyBinder mBinder;
-    private ArrayList<MyMenu> mMyMenus;
+    private ArrayList<MyMenu> mMyMenus = new ArrayList<>();
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -44,6 +46,11 @@ public class BossActivity extends AppCompatActivity {
             mBinder = (SocketService.MyBinder) service;
             mMyMenus = mBinder.getMenus();
             mAdapter.notifyDataSetChanged();
+            if(mMyMenus.size() == 0) {
+                mOrder.setVisibility(View.VISIBLE);
+            } else {
+                mOrder.setVisibility(View.INVISIBLE);
+            }
             /*SerializableUtil.writeToLocal(mMyMenus,BossActivity.this,"bossMenu");
             ArrayList<MyMenu> menuss  = (ArrayList<MyMenu>) SerializableUtil.parseFromLocal(BossActivity.this,"bossMenu");
             if(menuss != null) {
@@ -65,10 +72,14 @@ public class BossActivity extends AppCompatActivity {
     };
 
     private DataChangeReceiver receiver;
+    private RelativeLayout mOrder;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.boss_activity);
+
+        mOrder = (RelativeLayout) findViewById(R.id.no_order);
         Toolbar toolbar = (Toolbar) findViewById(R.id.boss_toolbar);
 
         // toolbar.setNavigationIcon(R.mipmap.ic_launcher);//设置导航栏图标
@@ -93,7 +104,17 @@ public class BossActivity extends AppCompatActivity {
                         Toast.makeText(BossActivity.this, "退出", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.search:
-                        Toast.makeText(BossActivity.this, "搜索", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(BossActivity.this, "已刷新", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.change:
+                        unbindService(mConnection);
+                        startActivity(new Intent(BossActivity.this,HomeActivity.class));
+                        sp = getSharedPreferences("config",Context.MODE_PRIVATE);
+                        SharedPreferences.Editor edit = sp.edit();
+                        edit.putBoolean("isBoss",false);
+                        edit.apply();
+                        finish();
+                        finish();
                         break;
                 }
                 return true;
@@ -110,19 +131,25 @@ public class BossActivity extends AppCompatActivity {
             Toast.makeText(this, "服务被成功绑定了", Toast.LENGTH_SHORT).show();
             ListView listView = (ListView) findViewById(R.id.orders);
 
-            mMyMenus = new ArrayList<>();//mBinder.getMenus();//
+          //  mMyMenus = new ArrayList<>();//mBinder.getMenus();//
             mAdapter = new OrderAdapter();
+            if(mMyMenus.size() == 0) {
+                mOrder.setVisibility(View.VISIBLE);
+            } else {
+                mOrder.setVisibility(View.INVISIBLE);
+            }
             listView.setAdapter(mAdapter);
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    MyMenu menu = mMyMenus.get(position);
+                    int count = mMyMenus.size();
+                    MyMenu menu = mMyMenus.get(count - 1 - position);
                     Intent intent = new Intent(BossActivity.this,MenuActivity.class);
 
                     intent.putExtra("menu", menu);
                 //    unbindService(mConnection);
-                    startActivityForResult(intent,position);
+                    startActivityForResult(intent,count - 1 - position);
 
                 }
             });
@@ -163,7 +190,11 @@ public class BossActivity extends AppCompatActivity {
         mMyMenus.get(requestCode).setStatus(data.getIntExtra("status",MyMenu.WAITTING));
         mAdapter.notifyDataSetChanged();
         mBinder.setMyMenu(mMyMenus);
-
+        if(mMyMenus.size() == 0) {
+            mOrder.setVisibility(View.VISIBLE);
+        } else {
+            mOrder.setVisibility(View.INVISIBLE);
+        }
         /*ArrayList<MyMenu> menuss  = (ArrayList<MyMenu>) SerializableUtil.parseFromLocal(BossActivity.this,"bossMenu");
         if(menuss != null) {
             Log.e(TAG,mMyMenus.toString());
@@ -179,7 +210,7 @@ public class BossActivity extends AppCompatActivity {
     protected void onDestroy() {
         unregisterReceiver(receiver);
         receiver = null;
-        unbindService(mConnection);
+//        unbindService(mConnection);
         super.onDestroy();
     }
 
@@ -190,10 +221,11 @@ public class BossActivity extends AppCompatActivity {
     }
 
     private class OrderAdapter extends BaseAdapter{
-
+        private int count;
         @Override
         public int getCount() {
-            return mMyMenus.size();
+            count = mMyMenus.size();
+            return count;
         }
 
         @Override
@@ -217,22 +249,24 @@ public class BossActivity extends AppCompatActivity {
                 holder.seatNum = (TextView) view.findViewById(R.id.seat_num_order);
                 holder.price = (TextView) view.findViewById(R.id.order_price);
                 holder.status = (TextView) view.findViewById(R.id.status);
+                holder.time = (TextView) view.findViewById(R.id.time);
                 view.setTag(holder);
             } else {
                 view = convertView;
                 holder = (BossViewHolder) view.getTag();
             }
 
-            holder.ordeImage.setImageResource(mMyMenus.get(position).getDishs().get(0).getImage());
-            holder.seatNum.setText(mMyMenus.get(position).getSeatNum() + "号桌");
-            holder.price.setText("合计：￥"+mMyMenus.get(position).getAllPrice());
-            if(mMyMenus.get(position).getStatus() == MyMenu.OK) {
+            holder.ordeImage.setImageResource(mMyMenus.get(count - 1 - position).getDishs().get(0).getImage());
+            holder.seatNum.setText(mMyMenus.get(count - 1 - position).getSeatNum() + "号桌");
+            holder.price.setText("合计：￥"+mMyMenus.get(count - 1 - position).getAllPrice());
+            if(mMyMenus.get(count - 1 - position).getStatus() == MyMenu.OK) {
                 holder.status.setText("已完成");
-            } else if(mMyMenus.get(position).getStatus() == MyMenu.STARTING) {
+            } else if(mMyMenus.get(count - 1 - position).getStatus() == MyMenu.STARTING) {
                 holder.status.setText("正在上菜");
-            } if(mMyMenus.get(position).getStatus() == MyMenu.WAITTING) {
+            } if(mMyMenus.get(count - 1 - position).getStatus() == MyMenu.WAITTING) {
                 holder.status.setText("等待中.....");
             }
+            holder.time.setText(mMyMenus.get(count - 1 - position).getSubmitTime());
 
             return view;
         }
@@ -243,7 +277,7 @@ public class BossActivity extends AppCompatActivity {
         public TextView seatNum;
         public TextView price;
         public TextView status;
-
+        public TextView time;
 
     }
 
@@ -254,6 +288,14 @@ public class BossActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             mMyMenus = mBinder.getMenus();
             mAdapter.notifyDataSetChanged();
+
+            if(mMyMenus.size() == 0) {
+                mOrder.setVisibility(View.VISIBLE);
+            } else {
+                mOrder.setVisibility(View.INVISIBLE);
+            }
+
+
             /*SerializableUtil.writeToLocal(mMyMenus,BossActivity.this,"bossMenu");
             ArrayList<MyMenu> menuss  = (ArrayList<MyMenu>) SerializableUtil.parseFromLocal(BossActivity.this,"bossMenu");
             if(menuss != null) {

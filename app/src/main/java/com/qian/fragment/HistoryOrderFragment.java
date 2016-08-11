@@ -60,7 +60,9 @@ public class HistoryOrderFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                MyMenu menu = completeMenu.get(position).getMenu();
+                int size = completeMenu.size();
+
+                MyMenu menu = completeMenu.get(size - 1 - position).getMenu();
                 Intent intent = new Intent(HistoryOrderFragment.this.getActivity(), MenuCustomerActivity.class);
 
                 intent.putExtra("menu", menu);
@@ -94,15 +96,16 @@ public class HistoryOrderFragment extends Fragment {
 
     }
     private class NewOrderAdapter extends BaseAdapter {
-
+        private int count;
         private Context mContext;
         public NewOrderAdapter(Context context) {
+            count = completeMenu.size();
             mContext = context;
         }
 
         @Override
         public int getCount() {
-            return completeMenu.size();
+            return count;
         }
 
         @Override
@@ -119,7 +122,7 @@ public class HistoryOrderFragment extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             View view;
             ViewHolder holder = null;
-            SendedMenu menu = completeMenu.get(position);
+            SendedMenu menu = completeMenu.get(count - 1 - position);
             if(convertView == null) {
                 holder = new ViewHolder();
                 view = View.inflate(mContext, R.layout.item_new_order,null);
@@ -129,6 +132,7 @@ public class HistoryOrderFragment extends Fragment {
                 holder.confimOrder = (TextView) view.findViewById(R.id.confim_order);
                 holder.waittingTime = (TextView) view.findViewById(R.id.waitting_time);
                 holder.orderDesc = (TextView) view.findViewById(R.id.order_desc);
+                holder.submitTime = (TextView) view.findViewById(R.id.submit_time);
                 view.setTag(holder);
             } else {
                 view = convertView;
@@ -137,7 +141,7 @@ public class HistoryOrderFragment extends Fragment {
 
             holder.ordeImage.setImageResource(menu.getMenu().getDishs().get(0).getImage());
             holder.seatNum.setText(menu.getMenu().getSeatNum() + "号桌");
-            holder.price.setText("合计：￥"+menu.getMenu().getAllPrice());
+            holder.price.setText("￥"+menu.getMenu().getAllPrice());
             holder.confimOrder.setText("订单已确认");
 
 
@@ -155,7 +159,7 @@ public class HistoryOrderFragment extends Fragment {
                 holder.orderDesc.setText(dishList.get(0).getName() + "," + dishList.get(1).getName() + "等"+dishList.size() +"道菜");
             }
 
-
+            holder.submitTime.setText(menu.getMenu().getSubmitTime());
 
             return view;
         }
@@ -168,7 +172,7 @@ public class HistoryOrderFragment extends Fragment {
         public TextView confimOrder;
         public TextView waittingTime;
         public TextView orderDesc;
-
+        public TextView submitTime;
     }
 
 

@@ -7,8 +7,12 @@ public class Msg implements Serializable {
 	private static final long serializableVersionUID = 2L;
 	public static final int MENU_RESPONSE = 0;//应答消息
 	public static final int MENU_DATA = 1;//菜单数据
-	public static final int TEST = 2;//测试数据
+	//public static final int TEST = 2;//测试数据
 	public static final int START_DISH = 3;//开始上菜
+
+
+	public static final int REQUEST_BOSS_IP = 2;//请求老板IP
+	public static final int RESPONSE_BOSS_IP = 5;//回应老板IP
 
 
 	private String sendUser;// 发送人 用户名

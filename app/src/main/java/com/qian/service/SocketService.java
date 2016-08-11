@@ -30,6 +30,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
@@ -55,11 +56,12 @@ public class SocketService extends Service {
     public static final int SHOW = 8000;// 显示消息
 
     //定义发送接收ip地址
-    public static final String  receiveIP = "192.168.1.107";
-    public static final String  sendIP = "192.168.1.102";
+    public static String  receiveIP = "192.168.1.255";
+    private boolean isBoss;
+    private boolean isConnected = false;
 
 
-   // private SelectedDish selectedDish;
+    // private SelectedDish selectedDish;
     @Override
     public IBinder onBind(Intent intent) {
         return new MyBinder();
@@ -70,24 +72,44 @@ public class SocketService extends Service {
         super.onCreate();
       //  selectedDish = SelectedDish.getInstance(this);
         sp = getSharedPreferences("config", Context.MODE_PRIVATE);
+
+        isBoss = sp.getBoolean("isBoss",false);
+
+
         receiveMsg();
 
         bossMenus = new ArrayList<>();
 
         ArrayList<Dish> dishs =  XmlUtil.parserXmlFromLocal();
-        Log.e("SocketService",dishs.toString());
+//        Log.e("SocketService",dishs.toString());
         if(dishs != null) {
             setDishs(dishs);
         }
 
         bossMenus  = (ArrayList<MyMenu>) SerializableUtil.parseFromLocal(this,"bossMenu");
-
+        if(bossMenus == null) {
+            bossMenus = new ArrayList<>();
+        }
     }
 
     /**
      * 返回的Binder对象
      */
     public class MyBinder extends Binder {
+
+        public boolean isConnected() {
+            return isConnected;
+        }
+
+        public void requestBossIp() {
+
+
+            sendSocketMsg(new Msg("qianhaifeng",
+                    getLocalHostIp(),
+                    "", getBroadCastIP(),//广播请求老板IP
+                    Msg.REQUEST_BOSS_IP,
+                    "REQUEST_BOSS_IP"));
+        }
 
         public void sendMsg(Msg msg) {
             sendSocketMsg(msg);
@@ -165,9 +187,7 @@ public class SocketService extends Service {
             // Log.e(Tag,mDish.getDishType() + "--" + dish.getDishType());
             if(mDish.getDishType() == dish.getDishType()) {
                 if(mDish.getId() == dish.getId()) {
-
                     mDish.setCount(count);
-
                 }
             }
         }
@@ -175,10 +195,6 @@ public class SocketService extends Service {
         SharedPreferences.Editor edit = sp.edit();
         edit.putBoolean("isModified", true);
         edit.apply();
-
-
-
-
     }
 
     /**
@@ -300,7 +316,7 @@ public class SocketService extends Service {
      */
     // 发送消息
     public void sendSocketMsg(Msg msg) {
-        Tips(SocketService.SHOW, "发送数据");
+       // Tips(SocketService.SHOW, "发送数据");
         (new UdpSend(msg)).start();
     }
 
@@ -365,14 +381,15 @@ public class SocketService extends Service {
                         String[] datas = msgData.split("division");
 
 
-                        Tips(SocketService.SHOW, datas[0]);
-                        Tips(SocketService.SHOW, "座位号"+ datas[1]);
-                        Tips(SocketService.SHOW, "合计"+ datas[2]);
+                    //    Tips(SocketService.SHOW, datas[0]);
+                    //    Tips(SocketService.SHOW, "座位号"+ datas[1]);
+                     //   Tips(SocketService.SHOW, "合计"+ datas[2]);
 
 
                         ArrayList<Dish> list =  XmlUtil.parserXmlFromString(datas[0]);
-
-                        MyMenu myMenu = new MyMenu(list,datas[1],datas[2],msg.getSendUserIp(),MyMenu.WAITTING);
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+                        String submitTime = df.format(new java.util.Date());// new Date()为获取当前系统时间
+                        MyMenu myMenu = new MyMenu(list,datas[1],datas[2],msg.getSendUserIp(),MyMenu.WAITTING,submitTime);
                         bossMenus.add(myMenu);
                         SerializableUtil.writeToLocal(bossMenus,SocketService.this,"bossMenu");
                        // ArrayList<MyMenu> menuss  = (ArrayList<MyMenu>) SerializableUtil.parseFromLocal(this,"bossMenu");
@@ -391,33 +408,36 @@ public class SocketService extends Service {
                         //获得大约等待时间
                         int allDishNum = 0;
                         for(int j = 0;j < bossMenus.size() - 1; j ++) {
-
-                            ArrayList<Dish> dishs = bossMenus.get(j).getDishs();
-                            for(int i = 0;i < dishs.size();i ++) {
-                                allDishNum += dishs.get(i).getCount();
+                            MyMenu myMenu1 = bossMenus.get(j);
+                            if(myMenu1.getStatus() != MyMenu.OK) {
+                                ArrayList<Dish> dishs = myMenu1.getDishs();
+                                for (int i = 0; i < dishs.size(); i++) {
+                                    allDishNum += dishs.get(i).getCount();
+                                }
                             }
                         }
                         //返回应答信号
                         Msg msg1 = new Msg("boss",
                                 getLocalHostIp(),
-                                "", sendIP,//目标IP
+                                "", msg.getSendUserIp(),//目标IP
                                 Msg.MENU_RESPONSE,
                                 allDishNum + "");//等待时间返回
                         Log.e("SocketService","发送应答信号");
                         sendSocketMsg(msg1);
                     } else if(msg.getMsgType() == Msg.MENU_RESPONSE && !msg.getSendUserIp().equals(getLocalHostIp()) ) {
 
-                        Tips(SocketService.SHOW, "收到应答信号" + msg.getBody().toString());
+                      //  Tips(SocketService.SHOW, "收到应答信号" + msg.getBody().toString());
                       //  Log.e("SocketService","收到应答信号");
-
-                        MyMenu menu = new MyMenu(mDishs,sp.getString("seatNum", ""), getAllPrice()+ "");
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+                        String submitTime = df.format(new java.util.Date());// new Date()为获取当前系统时间
+                        MyMenu menu = new MyMenu(mDishs,sp.getString("seatNum", ""), getAllPrice()+ "",submitTime);
                      //   Log.e("SocketService",mDishs.toString());
                         String waitTime = msg.getBody().toString();///intent.getStringExtra("waitTime");
                         SendedMenu sendedMenu1 = new SendedMenu(menu,waitTime);
-
+                        sendedMenu.clear();
                         sendedMenu.add(sendedMenu1);
-                   //     Log.e("SocketService序列化前",sendedMenu.toString());
-                        XmlUtil.writeSendedMenuXmlToLocal(sendedMenu,"sendedMenu");
+                        SerializableUtil.writeToLocal(sendedMenu,SocketService.this,"sendedMenu");
+
                    //     sendedMenu = XmlUtil.parserXmlFromLocal("sendedMenu");
                    //     Log.e("SocketService序列化后",sendedMenu.toString());
 
@@ -427,12 +447,39 @@ public class SocketService extends Service {
                         intent.putExtra("waitTime",msg.getBody().toString());//防止返回也会修改
                         sendBroadcast(intent);
 
-                    } else if(msg.getMsgType() == Msg.START_DISH) {
+                    } else if(msg.getMsgType() == Msg.START_DISH) {//客户端
                         //发广播更新界面
                         Intent intent = new Intent();
                         intent.setAction("com.qian.startDish");
                         intent.putExtra("status",msg.getBody().toString());//防止返回也会修改
                         sendBroadcast(intent);
+                    } else if(msg.getMsgType() == Msg.REQUEST_BOSS_IP && !msg.getSendUserIp().equals(getLocalHostIp()) && isBoss) {//服务端使用
+
+                        //返回服务端IP地址
+
+                        Log.e("SocketService",isBoss + "Boss");
+                        Msg msg2 = new Msg("boss",
+                                getLocalHostIp(),
+                                "", getBroadCastIP(),//广播老板IP
+                                Msg.RESPONSE_BOSS_IP,
+                                getLocalHostIp());//老板自己IP地址
+                        Log.e("SocketService","发送老板IP信号" + getLocalHostIp() + "目标IP" + msg.getSendUserIp());
+                        Tips(SocketService.SHOW, "发送老板IP信号" + getLocalHostIp() + "目标IP" + msg.getSendUserIp());
+                        sendSocketMsg(msg2);
+                    } else if(msg.getMsgType() == Msg.RESPONSE_BOSS_IP && !msg.getBody().toString().equals(getLocalHostIp()) && !isBoss) {//客户端接收使用
+                        Tips(SocketService.SHOW, "收到老板IP信号" + msg.getBody().toString());
+                        Log.e("SocketService","收到老板IP信号" + getLocalHostIp());
+                        receiveIP = msg.getBody().toString();
+                        isConnected = true;
+
+                        //发广播更新界面
+                        Intent intent = new Intent();
+                        intent.setAction("com.qian.connect");
+                        intent.putExtra("isConnected",isConnected);//防止返回也会修改
+                        sendBroadcast(intent);
+
+
+                        Log.e("SocketService",isBoss + "Boss");
                     }
 
 

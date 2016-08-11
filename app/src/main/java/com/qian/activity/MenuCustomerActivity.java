@@ -6,16 +6,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.qian.R;
 import com.qian.entity.Dish;
@@ -38,9 +34,9 @@ public class MenuCustomerActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.customer_menu_toolbar);
         Intent intent = this.getIntent();
         MyMenu menu = (MyMenu) intent.getSerializableExtra("menu");
-        Log.e(TAG,menu.toString());
+        //Log.e(TAG,menu.toString());
         // toolbar.setNavigationIcon(R.mipmap.ic_launcher);//设置导航栏图标
-        toolbar.setLogo(R.drawable.logo);//设置app logo
+       // toolbar.setLogo(R.drawable.logo);//设置app logo
         toolbar.setTitle("我的订单("+menu.getSeatNum() + "号桌)");//设置主标题
         toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
         //  toolbar.setSubtitle("Subtitle");//设置子标题
@@ -54,7 +50,7 @@ public class MenuCustomerActivity extends AppCompatActivity {
              //   Toast.makeText(MenuActivity.this, "返回", Toast.LENGTH_SHORT).show();
             }
         });
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+       /* toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
@@ -67,19 +63,19 @@ public class MenuCustomerActivity extends AppCompatActivity {
                 }
                 return true;
             }
-        });
+        });*/
 
         mBossMenu = (ListView) findViewById(R.id.lv_customer_menu);
 
         mAdapter = new MenuAdapter(this,menu.getDishs());
         mBossMenu.setAdapter(mAdapter);
     }
-
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
-    }
+    }*/
 
 
     private class MenuViewHolder {

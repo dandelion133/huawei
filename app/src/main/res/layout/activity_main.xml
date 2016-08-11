@@ -4,55 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/orange"
     tools:context=".activity.WelcomeActivity">
 
 
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:src="@drawable/ic_logo_big"
         android:layout_centerInParent="true"
-        >
-        <RelativeLayout
-            android:onClick="select"
-            android:id="@+id/customer"
-            android:background="@color/colorPrimary"
-            android:layout_width="match_parent"
-            android:layout_height="80dp">
-            <TextView
-                android:layout_centerInParent="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="我是顾客"
-                android:textColor="@color/white"
-                android:textSize="30sp"
-                />
-        </RelativeLayout>
-        <RelativeLayout
-            android:onClick="select"
-            android:id="@+id/boss"
-            android:background="@color/colorPrimary"
-            android:layout_marginTop="30dp"
-            android:layout_width="match_parent"
-            android:layout_height="80dp">
-            <TextView
-                android:layout_centerInParent="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="我是老板"
-                android:textColor="@color/white"
-                android:textSize="30sp"
-                />
-        </RelativeLayout>
-    </LinearLayout>
-
-    <Button
-        android:onClick="send"
-        android:id="@+id/send"
+        />
+    <TextView
+        android:id="@+id/app_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="发送消息"
+        android:text="点吧"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:gravity="center_horizontal"
+        android:layout_above="@id/logo"
         />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="欢迎使用"
+        android:textColor="@color/white"
+        android:textSize="50sp"
+        android:gravity="center_horizontal"
+        android:layout_above="@id/app_name"
+        android:layout_marginBottom="30dp"
+        />
+
+    <TextView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="快捷方便，一键点餐"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:gravity="center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        />
+
+
+
 </RelativeLayout>

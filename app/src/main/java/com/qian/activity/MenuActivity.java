@@ -10,8 +10,6 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -66,7 +64,7 @@ public class MenuActivity extends AppCompatActivity {
 
         Log.e(TAG,menu.toString());
         // toolbar.setNavigationIcon(R.mipmap.ic_launcher);//设置导航栏图标
-        toolbar.setLogo(R.drawable.logo);//设置app logo
+      //  toolbar.setLogo(R.drawable.logo);//设置app logo
         toolbar.setTitle(menu.getSeatNum() + "号桌菜单");//设置主标题
         toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
         //  toolbar.setSubtitle("Subtitle");//设置子标题
@@ -85,7 +83,7 @@ public class MenuActivity extends AppCompatActivity {
              //   Toast.makeText(MenuActivity.this, "返回", Toast.LENGTH_SHORT).show();
             }
         });
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+       /* toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
@@ -98,7 +96,7 @@ public class MenuActivity extends AppCompatActivity {
                 }
                 return true;
             }
-        });
+        });*/
         //设置ListView
         mBossMenu = (ListView) findViewById(R.id.lv_boss_menu);
 
@@ -117,6 +115,7 @@ public class MenuActivity extends AppCompatActivity {
         //返回消息
         mCompleteMenu = (Button) findViewById(R.id.complete_menu);
         status = menu.getStatus();
+     //   Log.e(TAG,status + "");
         switch (status) {
             case MyMenu.OK:
                 mCompleteMenu.setEnabled(false);
@@ -214,11 +213,22 @@ public class MenuActivity extends AppCompatActivity {
    // startActivityForResult();
     }
 
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        Intent intent=new Intent();
+        intent.putExtra("status",status);
+        setResult(RESULT_OK, intent);
+
+        MenuActivity.this.finish();
+    }
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
-    }
+    }*/
 
     @Override
     protected void onDestroy() {

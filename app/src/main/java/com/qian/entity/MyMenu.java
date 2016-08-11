@@ -20,7 +20,15 @@ public class MyMenu implements Serializable {
     private String allPrice;
     private String ipAddress;//发送方ip地址  老板端用
     private int status; //订单状态
+    private String submitTime;
 
+    public String getSubmitTime() {
+        return submitTime;
+    }
+
+    public void setSubmitTime(String submitTime) {
+        this.submitTime = submitTime;
+    }
 
     public int getStatus() {
         return status;
@@ -62,18 +70,20 @@ public class MyMenu implements Serializable {
         this.allPrice = allPrice;
     }
 
-    public MyMenu(ArrayList<Dish> dishs, String seatNum, String allPrice) {
+    public MyMenu(ArrayList<Dish> dishs, String seatNum, String allPrice,String submitTime) {
         mDishs = dishs;
         this.seatNum = seatNum;
         this.allPrice = allPrice;
+        this.submitTime = submitTime;
     }
 
-    public MyMenu(ArrayList<Dish> dishs, String seatNum, String allPrice, String ipAddress,int status) {
+    public MyMenu(ArrayList<Dish> dishs, String seatNum, String allPrice, String ipAddress,int status,String submitTime) {
         mDishs = dishs;
         this.seatNum = seatNum;
         this.allPrice = allPrice;
         this.ipAddress = ipAddress;
         this.status = status;
+        this.submitTime = submitTime;
     }
 
     public MyMenu() {
@@ -84,7 +94,10 @@ public class MyMenu implements Serializable {
         return "MyMenu{" +
                 "mDishs=" + mDishs +
                 ", seatNum='" + seatNum + '\'' +
-                ", allPrice=" + allPrice +
+                ", allPrice='" + allPrice + '\'' +
+                ", ipAddress='" + ipAddress + '\'' +
+                ", status=" + status +
+                ", submitTime='" + submitTime + '\'' +
                 '}';
     }
 }

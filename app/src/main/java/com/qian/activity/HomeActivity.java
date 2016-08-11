@@ -1,8 +1,10 @@
 package com.qian.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -51,6 +53,8 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mBinder = (SocketService.MyBinder) service;
+            mBinder.requestBossIp();
+            Toast.makeText(HomeActivity.this, "发送请求老板IP", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -58,21 +62,28 @@ public class HomeActivity extends AppCompatActivity {
 
         }
     };
+    private Toolbar mToolbar;
+    private ConnectReceiver mReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+
+
       //  instance = this;
-        Toolbar toolbar = (Toolbar) findViewById(R.id.home_toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.home_toolbar);
 
        // toolbar.setNavigationIcon(R.mipmap.ic_launcher);//设置导航栏图标
-        toolbar.setLogo(R.drawable.logo);//设置app logo
-        toolbar.setTitle("点吧");//设置主标题
-        toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
-      //  toolbar.setSubtitle("Subtitle");//设置子标题
+        mToolbar.setLogo(R.drawable.logo);//设置app logo
+        mToolbar.setTitle("点吧");//设置主标题
+        mToolbar.setTitleTextColor(Color.parseColor("#ffffff"));
+        mToolbar.setSubtitle("未连接");//设置子标题
+        mToolbar.setSubtitleTextColor(Color.parseColor("#000000"));
        // toolbar.inflateMenu(R.menu.menu_home);//设置右上角的填充菜单
-        setSupportActionBar(toolbar);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        setSupportActionBar(mToolbar);
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
@@ -80,7 +91,17 @@ public class HomeActivity extends AppCompatActivity {
                         Toast.makeText(HomeActivity.this, "退出", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.search:
-                        Toast.makeText(HomeActivity.this, "搜索", Toast.LENGTH_SHORT).show();
+                        mBinder.requestBossIp();
+                        Toast.makeText(HomeActivity.this, "发送请求老板IP", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.change:
+                        unbindService(mConnection);
+                        startActivity(new Intent(HomeActivity.this,BossActivity.class));
+                        sp = getSharedPreferences("config",Context.MODE_PRIVATE);
+                        SharedPreferences.Editor edit = sp.edit();
+                        edit.putBoolean("isBoss",true);
+                        edit.apply();
+                        finish();
                         break;
                 }
                 return true;
@@ -93,6 +114,19 @@ public class HomeActivity extends AppCompatActivity {
         if(isSuccess) {
             initView();
             Toast.makeText(this, "服务被成功绑定了", Toast.LENGTH_SHORT).show();
+
+            //注册广播接收者
+            mReceiver = new ConnectReceiver();
+            // receiver = new DataChangeReceiver();
+            IntentFilter filter = new IntentFilter();
+            String action = "com.qian.connect";
+            filter.addAction(action);
+            filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+            registerReceiver(mReceiver,filter);
+
+
+
+
         } else {
             Toast.makeText(this, "服务没有成功绑定", Toast.LENGTH_SHORT).show();
         }
@@ -100,21 +134,25 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
+    }
 
+    private class ConnectReceiver  extends BroadcastReceiver {
 
-
-
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mToolbar.setSubtitle("已连接");//设置子标题
+            mToolbar.setSubtitleTextColor(Color.parseColor("#ffffffff"));
+        }
 
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
     }
-
-
-
 
 
     @Override
@@ -208,6 +246,8 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
     //    instance = null;
+        unregisterReceiver(mReceiver);
+        mReceiver = null;
         super.onDestroy();
     }
 }

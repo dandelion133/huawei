@@ -35,17 +35,18 @@
         android:textColor="@color/black1"
         />
     <TextView
-        android:id="@+id/my_order_price"
+        android:id="@+id/submit_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="合计：￥25"
+        android:text="[2016-7-8]"
         android:textSize="15sp"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="30dp"
-        android:textColor="@color/red"
+        android:layout_marginLeft="10dp"
+        android:textColor="@color/dark_grey"
         android:layout_toRightOf="@id/seat_num_new_order"
 
         />
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -70,6 +71,20 @@
         android:layout_below="@id/order_desc"
         android:layout_toRightOf="@id/new_order_image"
         android:layout_marginLeft="30dp"
+
+        />
+    <TextView
+        android:id="@+id/my_order_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="合计：￥25"
+        android:textSize="15sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:textColor="@color/red"
+        android:layout_below="@id/seat_num_new_order"
+        android:layout_alignParentRight="true"
+
 
         />
     <TextView

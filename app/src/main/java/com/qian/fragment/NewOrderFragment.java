@@ -22,7 +22,6 @@ import com.qian.entity.Dish;
 import com.qian.entity.MyMenu;
 import com.qian.entity.SendedMenu;
 import com.qian.utils.SerializableUtil;
-import com.qian.utils.XmlUtil;
 
 import java.util.ArrayList;
 
@@ -44,13 +43,19 @@ public class NewOrderFragment extends Fragment {
         View view = View.inflate(getActivity(), R.layout.fragment_my_oeder, null);
         ListView listView = (ListView) view.findViewById(R.id.new_order_lv);
        // mSendedMenu = new ArrayList<>();
-        mSendedMenu = XmlUtil.parserXmlFromLocal("sendedMenu");
-        Log.e(TAG,mSendedMenu.toString());
+      //  mSendedMenu = XmlUtil.parserXmlFromLocal("sendedMenu");
+        mSendedMenu = (ArrayList<SendedMenu>) SerializableUtil.parseFromLocal(getActivity(),"sendedMenu");
+
+        Log.e(TAG,status + "status");
+//        Log.e(TAG,mSendedMenu.toString());
         if(mSendedMenu != null) {
             Log.e(TAG,mSendedMenu.toString());
+            status = mSendedMenu.get(0).getMenu().getStatus();
         } else {
             Log.e(TAG,(mSendedMenu == null)+"mSendedMenu == null");
             mSendedMenu = new ArrayList<>();
+            Log.e(TAG,mSendedMenu.size() + "大小");
+            status = MyMenu.WAITTING;
         }
 
         mAdapter = new NewOrderAdapter(getActivity());
@@ -58,6 +63,7 @@ public class NewOrderFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 MyMenu menu = mSendedMenu.get(position).getMenu();
                 Intent intent = new Intent(NewOrderFragment.this.getActivity(), MenuCustomerActivity.class);
 
@@ -101,15 +107,24 @@ public class NewOrderFragment extends Fragment {
                 status = MyMenu.OK;
              //   Log.e(TAG,str + "1111");
             }
-
+            mSendedMenu.get(0).getMenu().setStatus(status);
+            SerializableUtil.writeToLocal(mSendedMenu,getActivity(),"sendedMenu");
             mAdapter.notifyDataSetChanged();
         }
 
     }
+
+    @Override
+    public void onDestroy() {
+        SerializableUtil.writeToLocal(mSendedMenu,getActivity(),"sendedMenu");
+        super.onDestroy();
+    }
+
     private class NewOrderAdapter extends BaseAdapter {
 
         private Context mContext;
         public NewOrderAdapter(Context context) {
+
             mContext = context;
         }
 
@@ -142,6 +157,7 @@ public class NewOrderFragment extends Fragment {
                 holder.confimOrder = (TextView) view.findViewById(R.id.confim_order);
                 holder.waittingTime = (TextView) view.findViewById(R.id.waitting_time);
                 holder.orderDesc = (TextView) view.findViewById(R.id.order_desc);
+                holder.submitTime = (TextView) view.findViewById(R.id.submit_time);
                 view.setTag(holder);
             } else {
                 view = convertView;
@@ -150,7 +166,7 @@ public class NewOrderFragment extends Fragment {
 
             holder.ordeImage.setImageResource(menu.getMenu().getDishs().get(0).getImage());
             holder.seatNum.setText(menu.getMenu().getSeatNum() + "号桌");
-            holder.price.setText("合计：￥"+menu.getMenu().getAllPrice());
+            holder.price.setText("￥"+menu.getMenu().getAllPrice());
             holder.confimOrder.setText("订单已确认");
 
             String waittingTime = menu.getWaittingTime();
@@ -167,13 +183,20 @@ public class NewOrderFragment extends Fragment {
                 menu.getMenu().setStatus(MyMenu.OK);
                 mCompleteMenu = (ArrayList<SendedMenu>) SerializableUtil.parseFromLocal(getActivity(),"mCompleteMenu");
                 boolean isHave = false;
-                for(SendedMenu sendedMenu : mCompleteMenu) {
-                    if(menu.toString().equals(sendedMenu.toString())) {
-                        isHave = true;
+                if(mCompleteMenu != null) {
+                    for(SendedMenu sendedMenu : mCompleteMenu) {
+                        if(menu.toString().equals(sendedMenu.toString())) {
+                            isHave = true;
+                        }
                     }
-                }
-                if(!isHave)
+                    if(!isHave)
+                        mCompleteMenu.add(menu);
+                } else {
+                    mCompleteMenu = new ArrayList<>();
                     mCompleteMenu.add(menu);
+                }
+
+
 
                 SerializableUtil.writeToLocal(mCompleteMenu,getActivity(),"mCompleteMenu");
 
@@ -198,7 +221,7 @@ public class NewOrderFragment extends Fragment {
             } else {
                 holder.orderDesc.setText(dishList.get(0).getName() + "," + dishList.get(1).getName() + "等"+dishList.size() +"道菜");
             }
-
+            holder.submitTime.setText(menu.getMenu().getSubmitTime());
 
 
             return view;
@@ -212,6 +235,7 @@ public class NewOrderFragment extends Fragment {
         public TextView confimOrder;
         public TextView waittingTime;
         public TextView orderDesc;
+        public TextView submitTime;
 
     }
 

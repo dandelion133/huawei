@@ -5,13 +5,17 @@
 
 
       <item android:id="@+id/search"
-            android:title="搜索"
+            android:title="刷新"
             android:orderInCategory="80"
-            android:icon="@drawable/bg_search"
+            android:icon="@drawable/refrash"
             app:showAsAction="ifRoom" />
-
+      <item android:id="@+id/change"
+            android:title="切换身份"
+            android:orderInCategory="90"
+            android:icon="@drawable/exit"
+            app:showAsAction="never" />
       <item android:id="@+id/exit"
-            android:title="退出"
+            android:title="退出应用"
             android:orderInCategory="90"
             android:icon="@drawable/exit"
             app:showAsAction="never" />

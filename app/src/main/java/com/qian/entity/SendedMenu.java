@@ -10,6 +10,7 @@ public class SendedMenu implements Serializable {
     private MyMenu mMenu;
     private String waittingTime;
 
+
     public MyMenu getMenu() {
         return mMenu;
     }
@@ -38,6 +39,7 @@ public class SendedMenu implements Serializable {
         return "SendedMenu{" +
                 "mMenu=" + mMenu +
                 ", waittingTime='" + waittingTime + '\'' +
+
                 '}';
     }
 }

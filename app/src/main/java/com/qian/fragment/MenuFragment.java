@@ -26,7 +26,10 @@ import com.qian.R;
 import com.qian.activity.HomeActivity;
 import com.qian.entity.Dish;
 import com.qian.entity.Msg;
+import com.qian.entity.MyMenu;
+import com.qian.entity.SendedMenu;
 import com.qian.service.SocketService;
+import com.qian.utils.SerializableUtil;
 import com.qian.utils.XmlUtil;
 
 import org.apache.http.conn.util.InetAddressUtils;
@@ -94,7 +97,8 @@ public class MenuFragment extends Fragment {
        /* for (Dish dish : dishList) {
             Log.e(Tag, dish + "");
         }*/
-        mAdapter = new MenuAdapter(getActivity(), binder.getDishList());
+        final ArrayList<Dish> dishList = binder.getDishList();
+        mAdapter = new MenuAdapter(getActivity(), dishList);
         listView.setAdapter(mAdapter);
       //  final int sumPrice = binder.getSumPrice();
 
@@ -106,6 +110,24 @@ public class MenuFragment extends Fragment {
             public void onClick(View v) {
             //    Toast.makeText(getActivity(),"提交菜单",Toast.LENGTH_SHORT).show();
                 //读取
+
+                if(TextUtils.isEmpty(seatNum.getText().toString())) {
+                    Toast.makeText(MenuFragment.this.getActivity(), "请输入桌位号", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if(dishList.size() == 0) {
+                    Toast.makeText(MenuFragment.this.getActivity(), "菜单为空", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    ArrayList<SendedMenu>  mSendedMenu = (ArrayList<SendedMenu>) SerializableUtil.parseFromLocal(getActivity(),"sendedMenu");
+                    if(mSendedMenu != null) {
+                        if(mSendedMenu.get(0).getMenu().getStatus() != MyMenu.OK) {
+                            Toast.makeText(MenuFragment.this.getActivity(), "您还有为完成的订单", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                }
+
+
                 mMsgStr = XmlUtil.getStringXmlFromLocal();
 
                 mMsgStr = mMsgStr + "division" + sp.getString("seatNum","")  + "division" + binder.getSumPrice() ;
@@ -174,7 +196,7 @@ public class MenuFragment extends Fragment {
 
            // mMyMenus = mBinder.getMenus();
           //  mAdapter.notifyDataSetChanged();
-            Toast.makeText(MenuFragment.this.getActivity(), "接受成功", Toast.LENGTH_SHORT).show();
+         //   Toast.makeText(MenuFragment.this.getActivity(), "接受成功", Toast.LENGTH_SHORT).show();
         }
 
     }
